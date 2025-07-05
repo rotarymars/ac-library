@@ -15,6 +15,8 @@ logger = getLogger(__name__)  # type: Logger
 class Expander:
     atcoder_include = re.compile(
         r'#include\s*["<](template/ac-library/atcoder/[a-z_]*(|.hpp))[">]\s*')
+    atcoder_include_2 = re.compile(
+        r'#include\s*["<](atcoder/[a-z_]*(|.hpp))[">]\s*')
 
     include_guard = re.compile(r'#.*ATCODER_[A-Z_]*_HPP')
 
@@ -55,7 +57,7 @@ class Expander:
             # if self.is_ignored_line(line):
             #     continue
 
-            m = self.atcoder_include.match(line)
+            m = self.atcoder_include.match(line) or self.atcoder_include_2.match(line)
             if m:
                 name = m.group(1)
                 result.extend(self.expand_acl(self.find_acl(name)))
@@ -71,8 +73,9 @@ class Expander:
         for line in source.splitlines():
             linenum += 1
             m = self.atcoder_include.match(line)
-            if m:
-                acl_path = self.find_acl(m.group(1))
+            m2 = self.atcoder_include_2.match(line)
+            if m or m2:
+                acl_path = self.find_acl(m.group(1) if m else m2.group(1))
                 result.extend(self.expand_acl(acl_path))
                 if origname:
                     result.append('#line ' + str(linenum + 1) + ' "' + origname + '"')
