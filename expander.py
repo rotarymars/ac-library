@@ -14,7 +14,7 @@ logger = getLogger(__name__)  # type: Logger
 
 class Expander:
     atcoder_include = re.compile(
-        r'#include\s*["<](template/ac-library/atcoder/[a-z_]*(|.hpp))[">]\s*')
+        r'#include\s*["<](template/[a-z_]*(|.hpp))[">]\s*')
     atcoder_include_2 = re.compile(
         r'#include\s*["<](atcoder/[a-z_]*(|.hpp))[">]\s*')
 
