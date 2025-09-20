@@ -63,6 +63,20 @@ struct dsu {
         return result;
     }
 
+    void detach(int a) {
+        assert(0 <= a && a < _n);
+        int old_leader = leader(a);
+
+        if (parent_or_size[old_leader] == -1) {
+            return;
+        }
+
+        parent_or_size[old_leader]++;
+        parent_or_size[a] = -1;
+
+        _rebuild_component(old_leader, a);
+    }
+
   private:
     int _n;
     // root node: -1 * component size
@@ -72,6 +86,28 @@ struct dsu {
     int _leader(int a) {
         if (parent_or_size[a] < 0) return a;
         return parent_or_size[a] = _leader(parent_or_size[a]);
+    }
+
+    void _rebuild_component(int old_leader, int detached_node) {
+        std::vector<int> nodes;
+        for (int i = 0; i < _n; i++) {
+            if (i != detached_node && leader(i) == old_leader) {
+                nodes.push_back(i);
+            }
+        }
+
+        if (nodes.empty()) return;
+
+        for (int node : nodes) {
+            parent_or_size[node] = -1;
+        }
+
+        int new_leader = nodes[0];
+        parent_or_size[new_leader] = -static_cast<int>(nodes.size());
+
+        for (int i = 1; i < nodes.size(); i++) {
+            parent_or_size[nodes[i]] = new_leader;
+        }
     }
 };
 
